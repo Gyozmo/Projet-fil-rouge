@@ -3,7 +3,7 @@ Highcharts.chart('container', {
         type: 'bar'
     },
     title: {
-        text: 'Stacked bar chart'
+        text: 'Compétences'
     },
     xAxis: {
         categories: ['Maquetter une application', 'Concevoir une base de données', 'Mettre en place une base de données',
@@ -12,16 +12,17 @@ Highcharts.chart('container', {
     },
     yAxis: {
         min: 0,
+        max: 100,
         title: {
-            text: 'Total fruit consumption'
+            text: 'Compétences acquises en pourcentages'
         }
     },
     legend: {
         reversed: true
     },
     plotOptions: {
-        series: {
-            stacking: 'normal'
+        bar: {
+            series: 'normal'
         }
     },
     series: [{
@@ -29,9 +30,9 @@ Highcharts.chart('container', {
         data: [5, 3, 4, 7, 2, 6, 5, 5, 5, 5, 5]
     }, {
         name: 'Jane',
-        data: [2, 2, 3, 2, 1]
+        data: [2,7,4]
     }, {
         name: 'Joe',
-        data: [3, 4, 4, 2, 5]
+        data: []
     }]
 });
