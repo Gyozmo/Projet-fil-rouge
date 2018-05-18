@@ -1,0 +1,16 @@
+/* general */
+
+
+/* header */
+header {
+    position:sticky;
+}
+
+/* Sidebar */
+#menu-toggle {
+    position: fixed;
+     /* left: -5px;  */
+    padding: 20px 10px; 
+    z-index: 2;
+}
+
