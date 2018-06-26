@@ -1,0 +1,30 @@
+/* general */
+
+
+/* header */
+header {
+    position:sticky;
+}
+
+/* Sidebar */
+#menu-toggle {
+    position: fixed;
+     /* left: -5px;  */
+    padding: 20px 10px;
+    z-index: 2;
+}
+
+#sidebar-wrapper {
+color: #fff
+}
+
+#sidebar-wrapper a {
+display: inline;
+    }
+
+
+/* Page content */
+
+#page-content-wrapper {
+margin: 0px 30px;
+}
