@@ -2,11 +2,10 @@
   "name": "fil-rouge",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "bootstrap": "^4.1.1",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "jquery": "^3.3.1",
-    "popper.js": "^1.14.3"
+    "mysql": "^2.15.0",
+    "passport": "^0.4.0"
   },
   "version": "1.0.0",
   "main": "index.js",
