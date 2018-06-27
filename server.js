@@ -41,22 +41,20 @@ passport.use('local', new LocalStrategy({
         // find a user whose username is the same as the forms username
         // we are checking to see if the user trying to login already exists
         con.query("select * from client where login = '" + username + "'", function (err, rows) {
+            console.log("ROWS: ", rows)
             if (err)
                 return done(err);
             if (!rows.length) {
                 return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
             }
-
             // if the user is found but the password is wrong
-
             /*if (!(rows[0].password == password))*/
-            console.log(rows[0].password)
-            console.log("RESULT: ",bcrypt.compareSync(password, rows[0].password))
+            console.log("HASH RESULT LENGTH: ", rows[0].password.length)
+            console.log("RESULT: ", bcrypt.compareSync(password, rows[0].password))
             if ((!bcrypt.compareSync(password, rows[0].password, function (err, res) {
                     console.log("res: ", res)
                 })))
                 return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
-
             // all is well, return successful user
             return done(null, rows[0]);
         })
@@ -92,17 +90,44 @@ app.get('/login', function (req, res) {
 });
 
 app.get('/signin', function (req, res) {
-    console.log("login page loaded")
+    console.log("signin page loaded")
     res.render('signin')
 });
 
 app.post('/signin', function (req, res) {
-    //console.log(req.body.username,req.body.usermail,req.body.userpassword)
     let user = req.body.username;
     let password = req.body.password;
     console.log(user, password)
+    //Now we check if username already exist, if true we send an error "login already exists"
+    con.query("select * from client where login = '" + user + "'", function (err, rows) {
+        console.log("ROWS: ", rows)
+        if (err)
+            //return done(err);
+            console.log(err)
+        if (rows.length) {
+            res.redirect('/signin')
+            console.log("user already exists")
+            //return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
+        } else {
+            console.log("we can create user");
+            bcrypt.hash(password, 10, function (err, hash) {
+                // Store hash in your password DB.
+                con.connect(function (err) {
+                    if (err) throw err;
+                    console.log('connected');
+                    var sql = "INSERT INTO client(login, password) VALUES (" + '"' + user + '","' + hash + '")';
+                    console.log(sql)
+                    con.query(sql, function (err, result) {
+                        if (err) throw err;
+                        console.log('utilisateur ajouté')
+                    })
+                })
+            });
+            res.redirect('/');
+        }
+    });
     //let hash = bcrypt.hashSync(password, 10);
-    bcrypt.hash(password, 10, function (err, hash) {
+    /*bcrypt.hash(password, 10, function (err, hash) {
         // Store hash in your password DB.
         con.connect(function (err) {
             if (err) throw err;
@@ -111,12 +136,11 @@ app.post('/signin', function (req, res) {
             console.log(sql)
             con.query(sql, function (err, result) {
                 if (err) throw err;
-                console.log('client ajouter')
+                console.log('utilisateur ajouté')
             })
         })
-    });
-
-    res.redirect('/');
+    });*/
+    
 });
 
 
@@ -182,3 +206,20 @@ function insertStorage() {
         })
     })
 }
+
+//CREATE TABLE
+/* con.connect(function(err){
+     if (err) throw err;
+     console.log('connected to DB');
+     var sql = "ALTER TABLE client MODIFY password VARCHAR(128) NOT NULL DEFAULT '{}'"
+     con.query(sql, function(err, result){
+         if(err) throw err;
+         console.log('table created');
+
+     })
+ })*/
+
+//Genere un log lors des erreurs sql
+con.on('error', function (err) {
+    console.log("[mysql error]", err);
+});
