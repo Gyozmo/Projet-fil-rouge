@@ -3,11 +3,20 @@
 
 Produit :
 
+Choix des techno
+Diagramme utilisateur
+Debut de conception de BDD
+
 
 Prévu :
 
+Finir la base de données
+Et tout le reste...
+
 
 Probleme :
+
+Petit blocage avec passeport.js
 
 
 
