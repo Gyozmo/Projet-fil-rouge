@@ -1,4 +1,5 @@
 const express = require('express');
+<<<<<<< HEAD
 const mysql = require('mysql');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -24,6 +25,9 @@ app.use(passport.session());
 app.get('/', function (req, res) {
     res.render('index')
 })
+=======
+const mysql = require('mysql')
+>>>>>>> 4ab9ef46c261c73d3c3abcb55edbf1bdc74c84ef
 
 app.listen(3000, function () {
     console.log('listening on 3000');
