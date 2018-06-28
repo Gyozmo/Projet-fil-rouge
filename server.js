@@ -2,10 +2,8 @@ const express = require('express');
 const mysql = require('mysql');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const flash = require("connect-flash");
 const bcrypt = require("bcrypt");
 let app = express();
-app.use(flash());
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 app.use(require('serve-static')(__dirname + '/../../public'));
@@ -21,8 +19,11 @@ app.use(require('express-session')({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', function (req, res) {
-    res.render('index')
+app.get('/', loggedIn, function (req, res) {
+    console.log(req.user.login)
+    res.render('index', {
+        user: req.user.login
+    })
 });
 
 app.listen(3000, function () {
@@ -41,56 +42,26 @@ passport.use('local', new LocalStrategy({
         // find a user whose username is the same as the forms username
         // we are checking to see if the user trying to login already exists
         con.query("select * from client where login = '" + username + "'", function (err, rows) {
-            console.log("ROWS: ", rows)
+            //console.log("ROWS: ", rows)
             if (err)
                 return done(err);
             if (!rows.length) {
-                return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
-                //req.flash('success', 'Registration successfully');
-                //res.locals.message = req.flash();
-                //res.render('login');
+                return done(null, false);
             }
             // if the user is found but the password is wrong
-            console.log("HASH RESULT LENGTH: ", rows[0].password.length)
-            console.log("RESULT: ", bcrypt.compareSync(password, rows[0].password));
-
-
             bcrypt.compare(password, rows[0].password, function (err, res) {
                 if (err)
-                        return done(err);
+                    return done(err);
                 if (res == false) {
-                        console.log("res: ", res)
-                        return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
-                        // all is well, return successful user
-                    } else {
-                        return done(null, rows[0], req.flash('loginMessage', 'User authentifié.'));
-                    }
+                    console.log("bad password")
+                    return done(null, false);
+                } else {
+                    // all is well, return successful user
+                    return done(null, rows[0]);
+                }
             });
-
-
-            /*if ((!bcrypt.compareSync(password, rows[0].password)), function (err, res) {
-                    console.log("res: ", res)
-                    if (err)
-                        return done(err);
-
-
-                    if (res == false) {
-                        console.log("res: ", res)
-                        return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
-                        // all is well, return successful user
-                    }
-                }*/
-
-
-           // )
-                //return done(null, rows[0]);
-
-
-
         })
     }))
-
-
 
 // required for persistent login sessions
 // passport needs ability to serialize and unserialize users out of session
@@ -109,33 +80,21 @@ passport.deserializeUser(function (id, done) {
 //////////GESTION LOGIN////////////
 app.post('/login',
     passport.authenticate('local', {
-        failureRedirect: '/login',
-        failureFlash: true
+        failureRedirect: '/login'
     }),
     function (req, res) {
-        console.log("ICI: ",req.session.flash.loginMessage)
-        res.render('index',{
-            errorMsg: req.session.flash.loginMessage[0].toString()
+        res.render('index', {
+            user: req.user.login
         });
-        req.session.flash.loginMessage = [];
+
     });
 
 app.get('/login', function (req, res) {
-    //var test = req.session.flash
-    if (req.session.flash) {
-        //console.log(req.session.flash.loginMessage[0]);
-        res.render('login', {
-            errorMsg: req.session.flash.loginMessage[0].toString()
-        })
-        req.session.flash.loginMessage = [];
-        console.log(req.session.flash.loginMessage)
-    } else {
-
-        console.log("login page loaded")
-        res.render('login', {
-            errorMsg: ""
-        })
-    }
+    console.log("login page loaded")
+    res.render('login', {
+        errorMsg: ''
+    })
+    //}
 });
 
 ///////////GESTION SIGNIN///////////
@@ -153,66 +112,52 @@ app.post('/signin', function (req, res) {
     console.log(user, password)
     //Now we check if username already exist, if true we send an error "login already exists"
     con.query("select * from client where login = '" + user + "'", function (err, rows) {
-        console.log("ROWS: ", rows)
+        //console.log("ROWS: ", rows)
         if (err)
             //return done(err);
             console.log(err)
         if (rows.length) {
-            console.log("user already exists")
             let error = "Username déja utilisé";
             res.render('signin', {
                 errorMsg: error
             })
-            /*});*/
-
-            //return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
         } else {
             console.log("we can create user");
             bcrypt.hash(password, 10, function (err, hash) {
                 // Store hash in your password DB.
-                console.log('connected');
                 var sql = "INSERT INTO client(login, password) VALUES (" + '"' + user + '","' + hash + '")';
-                console.log(sql)
                 con.query(sql, function (err, result) {
                     if (err) throw err;
-                    console.log('utilisateur ajouté')
+                    console.log('added user successfully')
                 });
             });
             res.redirect('/');
         }
     });
-    //let hash = bcrypt.hashSync(password, 10);
-    /*bcrypt.hash(password, 10, function (err, hash) {
-        // Store hash in your password DB.
-        con.connect(function (err) {
-            if (err) throw err;
-            //console.log('connected');
-            var sql = "INSERT INTO client(login, password) VALUES (" + '"' + user + '","' + hash + '")';
-            console.log(sql)
-            con.query(sql, function (err, result) {
-                if (err) throw err;
-                console.log('utilisateur ajouté')
-            })
-        })
-    });*/
-
 });
-/////////////////////////////////
 
-/////////////PASSPORT END////////////////////
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
+app.get('/compAdd', loggedIn, function (req, res, next) {
+    // req.user - will exist
+    // load user orders and render them
+});
+///////////// PASSPORT END ////////////////////
+
+//check if user is logged in
+function loggedIn(req, res, next) {
+    if (req.user) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
 
 
-
-//SQL
-
-/*  SERVER SQL
-Server: sql7.freemysqlhosting.net
-Name: sql7244511
-Username: sql7244511
-Password: wcUkbMcLNl
-Port number: 3306
-*/
-
+//////////// SQL ///////////////////////
 //connection parameters
 var con = mysql.createConnection({
     host: "sql7.freemysqlhosting.net",
@@ -221,60 +166,9 @@ var con = mysql.createConnection({
     database: "sql7244511"
 });
 
-//CREATE TABLE
-// con.connect(function(err){
-//     if (err) throw err;
-//     console.log('connected to DB');
-//     var sql = "CREATE TABLE customers (name VARCHAR(45))"
-//     con.query(sql, function(err, result){
-//         if(err) throw err;
-//         console.log('table created');
-
-//     })
-// })
-
-//INSERT CLIENT INTO DB
-function insertClient() {
-
-    con.connect(function (err) {
-        if (err) throw err;
-        console.log('connected');
-        var sql = "INSERT INTO client(login, password) VALUES ('Paul','paul')";
-        con.query(sql, function (err, result) {
-            if (err) throw err;
-            console.log('client ajouter')
-        })
-    })
-
-}
-
-//STORAGE ADD
-function insertStorage() {
-
-    con.connect(function (err) {
-        if (err) throw err;
-        console.log('connected');
-        var sql = "INSERT INTO storage (name, format, date, price, author) VALUES ('le seigneur des anneaux','DVD','2002-09-17','20','Peter Jackson')";
-        con.query(sql, function (err, result) {
-            if (err) throw err;
-            console.log('storage ajouter')
-        })
-    })
-}
-
-//CREATE TABLE
-/* con.connect(function(err){
-     if (err) throw err;
-     console.log('connected to DB');
-     var sql = "ALTER TABLE client MODIFY password VARCHAR(128) NOT NULL DEFAULT '{}'"
-     con.query(sql, function(err, result){
-         if(err) throw err;
-         console.log('table created');
-
-     })
- })*/
 
 //Genere un log lors des erreurs sql
 con.on('error', function (err) {
     console.log("[mysql error]", err);
 });
+///////////// SQL END ////////////////////
