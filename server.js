@@ -181,6 +181,15 @@ app.post('/signin', function (req, res) {
             res.redirect('/');
         }
     });
+
+    //VIEW ADDCOMP
+    // app.get('/addcomp', function(req, res){
+    //     console.log("test")
+    //     res.render('addcomp')
+    // });
+
+
+
     //let hash = bcrypt.hashSync(password, 10);
     /*bcrypt.hash(password, 10, function (err, hash) {
         // Store hash in your password DB.
@@ -198,6 +207,10 @@ app.post('/signin', function (req, res) {
 
 });
 /////////////////////////////////
+
+app.get('/comp', function(req,res){
+    res.render('comp')
+})
 
 /////////////PASSPORT END////////////////////
 
