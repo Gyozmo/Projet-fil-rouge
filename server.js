@@ -46,17 +46,47 @@ passport.use('local', new LocalStrategy({
                 return done(err);
             if (!rows.length) {
                 return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
+                //req.flash('success', 'Registration successfully');
+                //res.locals.message = req.flash();
+                //res.render('login');
             }
             // if the user is found but the password is wrong
-            /*if (!(rows[0].password == password))*/
             console.log("HASH RESULT LENGTH: ", rows[0].password.length)
-            console.log("RESULT: ", bcrypt.compareSync(password, rows[0].password))
-            if ((!bcrypt.compareSync(password, rows[0].password, function (err, res) {
+            console.log("RESULT: ", bcrypt.compareSync(password, rows[0].password));
+
+
+            bcrypt.compare(password, rows[0].password, function (err, res) {
+                if (err)
+                        return done(err);
+                if (res == false) {
+                        console.log("res: ", res)
+                        return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
+                        // all is well, return successful user
+                    } else {
+                        return done(null, rows[0], req.flash('loginMessage', 'User authentifié.'));
+                    }
+            });
+
+
+            /*if ((!bcrypt.compareSync(password, rows[0].password)), function (err, res) {
                     console.log("res: ", res)
-                })))
-                return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
-            // all is well, return successful user
-            return done(null, rows[0]);
+                    if (err)
+                        return done(err);
+
+
+                    if (res == false) {
+                        console.log("res: ", res)
+                        return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
+                        // all is well, return successful user
+                    }
+                }*/
+
+
+           // )
+                //return done(null, rows[0]);
+
+
+
         })
     }))
 
@@ -76,22 +106,45 @@ passport.deserializeUser(function (id, done) {
     });
 });
 
+//////////GESTION LOGIN////////////
 app.post('/login',
     passport.authenticate('local', {
-        failureRedirect: '/login'
+        failureRedirect: '/login',
+        failureFlash: true
     }),
     function (req, res) {
-        res.redirect('/');
+        console.log("ICI: ",req.session.flash.loginMessage)
+        res.render('index',{
+            errorMsg: req.session.flash.loginMessage[0].toString()
+        });
+        req.session.flash.loginMessage = [];
     });
 
 app.get('/login', function (req, res) {
-    console.log("login page loaded")
-    res.render('login')
+    //var test = req.session.flash
+    if (req.session.flash) {
+        //console.log(req.session.flash.loginMessage[0]);
+        res.render('login', {
+            errorMsg: req.session.flash.loginMessage[0].toString()
+        })
+        req.session.flash.loginMessage = [];
+        console.log(req.session.flash.loginMessage)
+    } else {
+
+        console.log("login page loaded")
+        res.render('login', {
+            errorMsg: ""
+        })
+    }
 });
 
+///////////GESTION SIGNIN///////////
 app.get('/signin', function (req, res) {
     console.log("signin page loaded")
-    res.render('signin')
+    let error = "";
+    res.render('signin', {
+        errorMsg: error
+    });
 });
 
 app.post('/signin', function (req, res) {
@@ -105,23 +158,25 @@ app.post('/signin', function (req, res) {
             //return done(err);
             console.log(err)
         if (rows.length) {
-            res.redirect('/signin')
             console.log("user already exists")
+            let error = "Username déja utilisé";
+            res.render('signin', {
+                errorMsg: error
+            })
+            /*});*/
+
             //return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
         } else {
             console.log("we can create user");
             bcrypt.hash(password, 10, function (err, hash) {
                 // Store hash in your password DB.
-                con.connect(function (err) {
+                console.log('connected');
+                var sql = "INSERT INTO client(login, password) VALUES (" + '"' + user + '","' + hash + '")';
+                console.log(sql)
+                con.query(sql, function (err, result) {
                     if (err) throw err;
-                    console.log('connected');
-                    var sql = "INSERT INTO client(login, password) VALUES (" + '"' + user + '","' + hash + '")';
-                    console.log(sql)
-                    con.query(sql, function (err, result) {
-                        if (err) throw err;
-                        console.log('utilisateur ajouté')
-                    })
-                })
+                    console.log('utilisateur ajouté')
+                });
             });
             res.redirect('/');
         }
@@ -140,9 +195,9 @@ app.post('/signin', function (req, res) {
             })
         })
     });*/
-    
-});
 
+});
+/////////////////////////////////
 
 /////////////PASSPORT END////////////////////
 
