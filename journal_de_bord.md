@@ -28,13 +28,18 @@ Produit :
 
 Mise en place de passport.js + bcrypt
 Debut sur connnect-flash
-
+MCD
+Connection a DB
 
 Prévu :
+
+Faire les interasctions DB avec le serveur 
 
 
 Probleme :
 
+
+Conceptualiser de la BDD 
 
 
 
@@ -43,11 +48,17 @@ Probleme :
 
 Produit :
 
+Finalisation de la BDD
+
 
 Prévu :
 
+Assemblage des compétences aux inputs
+
 
 Probleme :
+
+Pas de problèmes 
 
 
 
