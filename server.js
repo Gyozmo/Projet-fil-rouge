@@ -248,19 +248,6 @@ function insertClient() {
 
 }
 
-//STORAGE ADD
-function insertStorage() {
-
-    con.connect(function (err) {
-        if (err) throw err;
-        console.log('connected');
-        var sql = "INSERT INTO storage (name, format, date, price, author) VALUES ('le seigneur des anneaux','DVD','2002-09-17','20','Peter Jackson')";
-        con.query(sql, function (err, result) {
-            if (err) throw err;
-            console.log('storage ajouter')
-        })
-    })
-}
 
 //CREATE TABLE
 /* con.connect(function(err){
@@ -273,6 +260,42 @@ function insertStorage() {
 
      })
  })*/
+
+
+        //COMP ADD
+ function insertComp() {
+
+    con.connect(function (err) {
+        if (err) throw err;
+        console.log('connected');
+        var sql = "INSERT INTO comp (compname) VALUES ('maquetter une application')";
+        con.query(sql, function (err, result) {
+            if (err) throw err;
+            console.log('comp ajoutée')
+        })
+    })
+}
+ 
+//insertComp() //COMP CALL
+
+
+        //NOTE ADD
+function insertNote() {
+
+    con.connect(function (err) {
+        if (err) throw err;
+        console.log('connected');
+        var sql = "INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES ('1','1','1','20')";
+        con.query(sql, function (err, result) {
+            if (err) throw err;
+            console.log('note ajoutée')
+        })
+    })
+}
+
+// insertNote();     //COMP CALL
+
+
 
 //Genere un log lors des erreurs sql
 con.on('error', function (err) {

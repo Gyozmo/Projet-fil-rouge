@@ -36,6 +36,6 @@ Highcharts.chart('container', {
         data: [2,7,4]
     }, {
         name: 'Joe',
-        data: []
+        data: [4,56,67,78,67]
     }]
 });
