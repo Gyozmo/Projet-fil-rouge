@@ -26,6 +26,9 @@ Petit blocage avec passeport.js
 
 Produit :
 
+Mise en place de passport.js + bcrypt
+Debut sur connnect-flash
+
 
 Prévu :
 
