@@ -135,16 +135,20 @@ app.post('/signin', function (req, res) {
         }
     });
 });
+/////////////////////////////////
 
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
+app.get('/comp', function (req, res) {
+    res.render('comp')
+})
+
+/////////////PASSPORT END////////////////////
+
+app.get('/logout', function (req, res) {
+    req.logout();
+    res.redirect('/');
 });
 
-app.get('/compAdd', loggedIn, function (req, res, next) {
-    // req.user - will exist
-    // load user orders and render them
-});
+
 ///////////// PASSPORT END ////////////////////
 
 //check if user is logged in
