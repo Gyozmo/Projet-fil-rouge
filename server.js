@@ -137,9 +137,15 @@ app.post('/signin', function (req, res) {
 });
 /////////////////////////////////
 
+
+//////// GESTION DES COMPETENCES//////////////////////////
 app.get('/comp', function (req, res) {
     res.render('comp')
-})
+});
+
+app.get('/compVote', function (req, res) {
+    res.render('compVote')
+});
 
 /////////////PASSPORT END////////////////////
 
