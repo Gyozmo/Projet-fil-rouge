@@ -8,7 +8,7 @@
 <h6 class="badge badge-pill badge-success">
             <%= user %>
         </h6>
-
+<h4 class="text-center"><%= title %></h4>
             <!-- Section 1 -->
             <section>
                 <div id="container" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div>
@@ -53,19 +53,17 @@
         }
     },
     series: [{
-        name: 'John',
+        name: <%-JSON.stringify( user)%>,
         data: [5, 3, 4, 7, 2, 6, 5, 5, 5, 5, 5]
-    }, {
-        name: 'Jane',
-        data: [2,7,4]
-    }, {
-        name: 'Joe',
-        data: [4,56,67,78,67]
-    }]
+    },{
+        name: <%-JSON.stringify( "Vote pour "+ user)%>,
+        data: [5, 3, 4, 7, 2, 6, 5, 5, 5, 5, 5]
+    }
+    ]
 });
         });
 </script>
-        </div>
+</div>
 
 
-        <%-include ../partials/footer.ejs%>
+<%-include ../partials/footer.ejs%>

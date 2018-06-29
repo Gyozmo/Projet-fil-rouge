@@ -135,7 +135,13 @@ app.post('/signin', function (req, res) {
         }
     });
 });
-/////////////////////////////////
+
+app.get('/logout', function (req, res) {
+    req.logout();
+    res.redirect('/');
+});
+/////////////PASSPORT END////////////////////
+
 
 
 //////// GESTION DES COMPETENCES//////////////////////////
@@ -147,16 +153,20 @@ app.get('/compVote', function (req, res) {
     res.render('compVote')
 });
 
-/////////////PASSPORT END////////////////////
-
-app.get('/logout', function (req, res) {
-    req.logout();
-    res.redirect('/');
+app.get('/stat', function (req, res){
+    console.log("page stat request")
+    res.render('stat',{
+        title: "Statistiques",
+        user: req.user.login
+    });
 });
 
 
-///////////// PASSPORT END ////////////////////
 
+
+
+
+/////////// FUNCTION //////////////
 //check if user is logged in
 function loggedIn(req, res, next) {
     if (req.user) {
