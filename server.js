@@ -83,7 +83,7 @@ app.post('/login',
         failureRedirect: '/login'
     }),
     function (req, res) {
-    console.log(req.user)
+        console.log(req.user)
         res.render('index', {
             user: req.user.login
         });
@@ -154,9 +154,11 @@ app.get('/comp', function (req, res) {
 app.post('/comp', function (req, res) {
     let compValue1 = req.body.comp1; //10 variables ? -_-
 
+
     con.query("SELECT * FROM `comp`", function () {
         //console.log(query)
     })
+
 
     console.log(compValue1)
 
@@ -215,13 +217,13 @@ con.on('error', function (err) {
 function recupNote(idclient) {
 
     //con.connect(function (err) {
-        //if (err) throw err;
-        //console.log('connected');
-        var sql = "SELECT * FROM note WHERE client_idclientvoter = " + idclient + " AND client_idclientvotant = " + idclient;
-        con.query(sql, function (err, result) {
-            if (err) throw err;
-            console.log("RESULT NOTES",result)
-        })
+    //if (err) throw err;
+    //console.log('connected');
+    var sql = "SELECT * FROM note WHERE client_idclientvoter = " + idclient + " AND client_idclientvotant = " + idclient;
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        console.log("RESULT NOTES", result)
+    })
     //})
 }
 
