@@ -83,6 +83,7 @@ app.post('/login',
         failureRedirect: '/login'
     }),
     function (req, res) {
+        console.log(req.user)
         res.render('index', {
             user: req.user.login
         });
@@ -145,31 +146,40 @@ app.get('/logout', function (req, res) {
 
 
 //////// GESTION DES COMPETENCES//////////////////////////
+////partie guillaume
 app.get('/comp', function (req, res) {
     res.render('comp')
 });
 
-app.post('/comp', function(req,res){
-let compValue1 = req.body.comp1; //10 variables ? -_-
+app.post('/comp', function (req, res) {
+    let compValue1 = req.body.comp1; //10 variables ? -_-
 
-con.query("SELECT * FROM `comp`", function(){
-//console.log(query)
-})
 
-console.log(compValue1)
+    con.query("SELECT * FROM `comp`", function () {
+        //console.log(query)
+    })
 
-res.redirect('/comp')
+
+    console.log(compValue1)
+
+    res.redirect('/comp')
 });
 
+/////partie philippe
 app.get('/compVote', function (req, res) {
     res.render('compVote')
 });
 
-app.get('/stat', function (req, res){
-    console.log("page stat request")
-    res.render('stat',{
+app.get('/stat', function (req, res) {
+    console.log("page stat request");
+    recupNote(req.user.idclient)
+    let compArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
+    let voteArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
+    res.render('stat', {
         title: "Statistiques",
-        user: req.user.login
+        user: req.user.login,
+        dataUser: compArr,
+        dataVote: voteArr
     });
 });
 
@@ -203,4 +213,18 @@ var con = mysql.createConnection({
 con.on('error', function (err) {
     console.log("[mysql error]", err);
 });
+
+function recupNote(idclient) {
+
+    //con.connect(function (err) {
+    //if (err) throw err;
+    //console.log('connected');
+    var sql = "SELECT * FROM note WHERE client_idclientvoter = " + idclient + " AND client_idclientvotant = " + idclient;
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        console.log("RESULT NOTES", result)
+    })
+    //})
+}
+
 ///////////// SQL END ////////////////////

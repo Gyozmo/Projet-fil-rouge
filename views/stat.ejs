@@ -54,10 +54,10 @@
     },
     series: [{
         name: <%-JSON.stringify( user)%>,
-        data: [5, 3, 4, 7, 2, 6, 5, 5, 5, 5, 5]
+        data: <%-JSON.stringify(dataUser) %>
     },{
         name: <%-JSON.stringify( "Vote pour "+ user)%>,
-        data: [5, 3, 4, 7, 2, 6, 5, 5, 5, 5, 5]
+        data: <%-JSON.stringify(dataVote) %>
     }
     ]
 });
