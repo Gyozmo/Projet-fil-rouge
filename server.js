@@ -152,18 +152,43 @@ app.get('/comp', function (req, res) {
 });
 
 app.post('/comp', function (req, res) {
-    let compValue1 = req.body.comp1; //10 variables ? -_-
+    //let compValue1 = req.body.comp1; //10 variables ? -_-
+    //con.connect(function (err) {
+        //if (err) throw err;
+       // console.log('connected');
+        var sql = 'INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES (' + req.user.idclient + ',' + req.user.idclient + ',' +
+            1 + ',' + req.body.comp1 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            2 + ',' + req.body.comp2 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            3 + ',' + req.body.comp3 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            4 + ',' + req.body.comp4 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            5 + ',' + req.body.comp5 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            6 + ',' + req.body.comp6 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            7 + ',' + req.body.comp7 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            8 + ',' + req.body.comp8 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            9 + ',' + req.body.comp9 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+            10 + ',' + req.body.comp10 + ')';
 
 
-    con.query("SELECT * FROM `comp`", function () {
+        console.log(sql)
+
+
+
+        //var sql = "INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES ('1','1','1','20')";
+        con.query(sql, function (err, result) {
+            if (err) throw err;
+            console.log('note ajoutée')
+        });
+    });
+
+    /*con.query("SELECT * FROM `comp`", function () {
         //console.log(query)
     })
 
 
     console.log(compValue1)
 
-    res.redirect('/comp')
-});
+    res.redirect('/comp')*/
+//});
 
 /////partie philippe
 app.get('/compVote', function (req, res) {
@@ -172,15 +197,36 @@ app.get('/compVote', function (req, res) {
 
 app.get('/stat', function (req, res) {
     console.log("page stat request");
-    recupNote(req.user.idclient)
-    let compArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
-    let voteArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
-    res.render('stat', {
+    let idclient = req.user.idclient;
+    var sql = "SELECT * FROM note WHERE client_idclientvoter = " + idclient + " AND client_idclientvotant = " + idclient;
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        console.log("RESULT NOTES", result[0].note)
+        let compArr = [Number(result[0].note),
+                       Number(result[1].note),
+                       Number(result[2].note),
+                       Number(result[3].note),
+                       Number(result[4].note),
+                       Number(result[5].note),
+                       Number(result[6].note),
+                       Number(result[7].note),
+                       Number(result[8].note),
+                       Number(result[9].note)];
+        console.log(compArr)
+        let voteArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
+        res.render('stat', {
         title: "Statistiques",
         user: req.user.login,
         dataUser: compArr,
         dataVote: voteArr
     });
+    });
+    
+    
+    //recupNote(req.user.idclient)
+    //let compArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
+    //let voteArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
+    
 });
 
 
