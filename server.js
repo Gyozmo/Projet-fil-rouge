@@ -160,7 +160,7 @@ app.post('/comp', function (req, res) {
     })
 
 
-    console.log(compValue1)
+    console.log('mon log' + compValue1)
 
     res.redirect('/comp')
 });
