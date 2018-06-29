@@ -1,6 +1,20 @@
 <%-include ../partials/head.ejs%>
   <%-include ../partials/nav.ejs%>
     <div class="container mt-3">
+		 <!-- Select personne -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Voter pour:</label>
+                    <div class="col-md-4 selectContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+                            <select name="state" class="form-control selectpicker">
+      <option value=" " >Merci de choisir la personne</option>
+      <option>tom</option>
+      <option>Laon</option>                         
+    </select>
+                        </div>
+                    </div>
+                </div>
       <form class="" action="/comp" method="post">
         <div class="form-group">
           <label for="exampleInputEmail1">Maquetter une application</label>
