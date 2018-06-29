@@ -90,6 +90,19 @@ function insertNote() {
 
 // insertNote();     //COMP CALL
 
+//RECUPERER NOTES
+function recupNote() {
+
+    con.connect(function (err) {
+        if (err) throw err;
+        console.log('connected');
+        var sql = "SELECT * FROM note WHERE login = '" + req.login.user + "'";
+        con.query(sql, function (err, result) {
+            if (err) throw err;
+            console.log(result)
+        })
+    })
+}
 
 
 //Genere un log lors des erreurs sql
