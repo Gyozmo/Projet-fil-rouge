@@ -1,4 +1,20 @@
 <%-include ../partials/head.ejs%>
-<%-include ../partials/navbar.ejs%>
-<p>Hello world</p>
+<%-include ../partials/nav.ejs%>
+
+<p>Choisissez vos compétences et valeurs : Valeur entre 0 et 100</p>
+
+<form class="" action="/comp" method="post">
+  <br>Compétence 1 : <input type="number" name="comp1" value="" max="100" min="0">
+  <br>Compétence 2 : <input type="number" name="comp2" value="" max="100" min="0">
+  <br>Compétence 3 : <input type="number" name="comp3" value="" max="100" min="0">
+  <br>Compétence 4 : <input type="number" name="comp4" value="" max="100" min="0">
+  <br>Compétence 5 : <input type="number" name="comp5" value="" max="100" min="0">
+  <br>Compétence 6 : <input type="number" name="comp6" value="" max="100" min="0">
+  <br>Compétence 7 : <input type="number" name="comp7" value="" max="100" min="0">
+  <br>Compétence 8 : <input type="number" name="comp8" value="" max="100" min="0">
+  <br>Compétence 9 : <input type="number" name="comp9" value="" max="100" min="0">
+  <br>Compétence 10 : <input type="number" name="comp10" value="" max="100" min="0">
+  <br><button type="submit" name="submitCompValue">Submit</button>
+</form>
+
 <%-include ../partials/footer.ejs%>

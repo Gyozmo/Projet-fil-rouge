@@ -149,6 +149,18 @@ app.get('/comp', function (req, res) {
     res.render('comp')
 });
 
+app.post('/comp', function(req,res){
+let compValue1 = req.body.comp1; //10 variables ? -_-
+
+con.query("SELECT * FROM `comp`", function(){
+console.log(query)
+})
+
+console.log(compValue1)
+
+res.redirect('/comp')
+});
+
 app.get('/compVote', function (req, res) {
     res.render('compVote')
 });
