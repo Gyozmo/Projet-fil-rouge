@@ -28,3 +28,13 @@ display: inline;
 #page-content-wrapper {
 margin: 0px 30px;
 }
+
+img {
+    margin: 0;
+}
+
+.navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+    
+}

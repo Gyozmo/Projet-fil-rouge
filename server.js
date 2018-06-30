@@ -205,22 +205,27 @@ app.get('/compVote', function (req, res) {
 });
 
 app.post('/compVote', function (req, res){
-    var sql = 'INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES (' + req.user.idclient + ',' + req.user.idclient + ',' +
-            1 + ',' + req.body.comp1 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            2 + ',' + req.body.comp2 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            3 + ',' + req.body.comp3 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            4 + ',' + req.body.comp4 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            5 + ',' + req.body.comp5 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            6 + ',' + req.body.comp6 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            7 + ',' + req.body.comp7 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            8 + ',' + req.body.comp8 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
-            9 + ',' + req.body.comp9 + '),(' + req.user.idclient + ',' + req.user.idclient + ',' +
+    //console.log("ID VOTE",req.body.idVoted)
+    var sqldelete = `DELETE FROM note WHERE client_idclientvoter = ${req.body.idVoted} AND client_idclientvotant = ${req.user.idclient}`;
+    con.query(sqldelete, function (err, result) {
+            if (err) throw err;
+            console.log('ancienne notes votée supprimmées');
+        var sql = 'INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES (' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            1 + ',' + req.body.comp1 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            2 + ',' + req.body.comp2 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            3 + ',' + req.body.comp3 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            4 + ',' + req.body.comp4 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            5 + ',' + req.body.comp5 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            6 + ',' + req.body.comp6 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            7 + ',' + req.body.comp7 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            8 + ',' + req.body.comp8 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
+            9 + ',' + req.body.comp9 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
             10 + ',' + req.body.comp10 + ')';
-    
-    con.query(sql, function (err, result) {
+        con.query(sql, function (err, result) {
             if (err) throw err;
             console.log('note votée ajoutée');
         });
+    });
 });
 
 //Recupere les notes perso sur la db, et les affiche
