@@ -192,7 +192,16 @@ app.post('/comp', function (req, res) {
 
 /////partie philippe
 app.get('/compVote', function (req, res) {
-    res.render('compVote')
+    var sql = 'SELECT * FROM client WHERE login != "'+ req.user.login + '"'; 
+    console.log(sql)
+    con.query(sql, function (err, userlist) {
+        console.log('USERLIST: ', userlist);
+        
+        res.render('compVote',{
+            users: userlist
+        })
+    });
+    
 });
 
 app.post('/compVote', function (req, res){
