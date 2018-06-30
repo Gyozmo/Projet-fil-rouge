@@ -190,7 +190,7 @@ app.post('/comp', function (req, res) {
     res.redirect('/comp')*/
 //});
 
-/////partie philippe
+//Affiche la page des votes
 app.get('/compVote', function (req, res) {
     var sql = 'SELECT * FROM client WHERE login != "'+ req.user.login + '"'; 
     console.log(sql)
@@ -204,13 +204,13 @@ app.get('/compVote', function (req, res) {
     
 });
 
+//Recupere les votes et les insert dans la db
 app.post('/compVote', function (req, res){
-    //console.log("ID VOTE",req.body.idVoted)
-    var sqldelete = `DELETE FROM note WHERE client_idclientvoter = ${req.body.idVoted} AND client_idclientvotant = ${req.user.idclient}`;
+    let sqldelete = `DELETE FROM note WHERE client_idclientvoter = ${req.body.idVoted} AND client_idclientvotant = ${req.user.idclient}`;
     con.query(sqldelete, function (err, result) {
             if (err) throw err;
             console.log('ancienne notes votée supprimmées');
-        var sql = 'INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES (' + req.body.idVoted + ',' + req.user.idclient + ',' +
+        let sql = 'INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES (' + req.body.idVoted + ',' + req.user.idclient + ',' +
             1 + ',' + req.body.comp1 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
             2 + ',' + req.body.comp2 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
             3 + ',' + req.body.comp3 + '),(' + req.body.idVoted + ',' + req.user.idclient + ',' +
@@ -235,7 +235,27 @@ app.get('/stat', function (req, res) {
     //requete vers notes perso
     let sql = "SELECT * FROM note WHERE client_idclientvoter = " + idclient + " AND client_idclientvotant = " + idclient;
     //requete vers notes votée
-    let sqlVote = "SELECT * FROM note WHERE client_idclientvoter = " + idclient + " AND NOT client_idclientvotant = " + idclient;
+    let sqlVote = `
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 1)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 2)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 3)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 4)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 5)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 6)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 7)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 8)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 9)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 10)`;
+    //console.log(sqlVote)
     con.query(sql, function (err, result) {
         if (err) throw err;
         
@@ -249,13 +269,26 @@ app.get('/stat', function (req, res) {
                        Number(result[7].note),
                        Number(result[8].note),
                        Number(result[9].note)];
-        let voteArr = [50, 30, 45, 70, 20, 60, 50, 50, 50, 50];
-        
-        res.render('stat', {
-            title: "Statistiques",
-            user: req.user.login,
-            dataUser: compArr,
-            dataVote: voteArr
+        con.query(sqlVote, function (err, result2) {
+            if (err) throw err;
+            let test = "AVG (note)"
+            console.log("AVG: ",result2[0]);
+            let voteArr =[Number(result2[0].avg),
+                       Number(result2[1].avg),
+                       Number(result2[2].avg),
+                       Number(result2[3].avg),
+                       Number(result2[4].avg),
+                       Number(result2[5].avg),
+                       Number(result2[6].avg),
+                       Number(result2[7].avg),
+                       Number(result2[8].avg),
+                       Number(result2[9].avg)]
+            res.render('stat', {
+                title: "Statistiques",
+                user: req.user.login,
+                dataUser: compArr,
+                dataVote: voteArr
+            });
         });
     });
 });
