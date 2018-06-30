@@ -1,10 +1,10 @@
 <%-include ../partials/head.ejs%>
     <%-include ../partials/navbar.ejs%>
 
-<div class="container bg-light mt-5 p-2 border col-3 rounded">
+<div class="container bg-light mt-5 p-2 border col col-lg-3 rounded">
     <h4 class="text-center mt-2">S'enregistrer</h4>
     <p class="text-center text-danger"><%= errorMsg %></p>
-    <form action="/signin" method="post">
+    <form action="/signin" method="post" class="m2">
          <div class="form-group">
             <label>Username:</label>
             <input type="text" name="username"><br/>
@@ -17,4 +17,5 @@
             <button type="submit" class="btn btn-outline-success" value="Submit">Ok</button>
         </div>
     </form>
+    <a class="btn btn-outline-success" href="/">Retour</a>
 </div>
