@@ -20,14 +20,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', loggedIn, function (req, res) {
-    console.log(req.user.login)
+    //console.log(req.user.login)
     res.render('index', {
         user: req.user.login
     })
 });
 
 app.listen(3000, function () {
-    console.log('listening on 3000');
+    //console.log('listening on 3000');
 })
 
 ///////PASSPORT//////////////
@@ -41,8 +41,8 @@ passport.use('local', new LocalStrategy({
     function (req, username, password, done) { // callback with username and password from our form
         // find a user whose username is the same as the forms username
         // we are checking to see if the user trying to login already exists
-        con.query("select * from client where login = '" + username + "'", function (err, rows) {
-            //console.log("ROWS: ", rows)
+        con.query(`SELECT * FROM client WHERE login = '${username}'`, function (err, rows) {
+            ////console.log("ROWS: ", rows)
             if (err)
                 return done(err);
             if (!rows.length) {
@@ -53,7 +53,7 @@ passport.use('local', new LocalStrategy({
                 if (err)
                     return done(err);
                 if (res == false) {
-                    console.log("bad password")
+                    //console.log("bad password")
                     return done(null, false);
                 } else {
                     // all is well, return successful user
@@ -72,7 +72,7 @@ passport.serializeUser(function (user, done) {
 
 // used to deserialize the user
 passport.deserializeUser(function (id, done) {
-    con.query("select * from client where idclient = " + id, function (err, rows) {
+    con.query(`SELECT * FROM client WHERE idclient = ${id}`, function (err, rows) {
         done(err, rows[0]);
     });
 });
@@ -83,7 +83,6 @@ app.post('/login',
         failureRedirect: '/login'
     }),
     function (req, res) {
-        console.log(req.user)
         res.render('index', {
             user: req.user.login
         });
@@ -91,7 +90,7 @@ app.post('/login',
     });
 
 app.get('/login', function (req, res) {
-    console.log("login page loaded")
+    //console.log("login page loaded")
     res.render('login', {
         errorMsg: ''
     })
@@ -100,7 +99,7 @@ app.get('/login', function (req, res) {
 
 ///////////GESTION SIGNIN///////////
 app.get('/signin', function (req, res) {
-    console.log("signin page loaded")
+    //console.log("signin page loaded")
     let error = "";
     res.render('signin', {
         errorMsg: error
@@ -108,12 +107,9 @@ app.get('/signin', function (req, res) {
 });
 
 app.post('/signin', function (req, res) {
-    let user = req.body.username;
-    let password = req.body.password;
-    console.log(user, password)
+    //console.log(req.body.username, req.body.password)
     //Now we check if username already exist, if true we send an error "login already exists"
-    con.query("select * from client where login = '" + user + "'", function (err, rows) {
-        //console.log("ROWS: ", rows)
+    con.query(`SELECT * FROM client WHERE login = '${req.body.username}'`, function (err, rows) {
         if (err)
             //return done(err);
             console.log(err)
@@ -123,13 +119,13 @@ app.post('/signin', function (req, res) {
                 errorMsg: error
             })
         } else {
-            console.log("we can create user");
-            bcrypt.hash(password, 10, function (err, hash) {
+            //console.log("we can create user");
+            bcrypt.hash(req.body.password, 10, function (err, hash) {
                 // Store hash in your password DB.
-                var sql = "INSERT INTO client(login, password) VALUES (" + '"' + user + '","' + hash + '")';
+                var sql = `INSERT INTO client(login, password) VALUES ('${req.body.username}', '${hash}')`;
                 con.query(sql, function (err, result) {
                     if (err) throw err;
-                    console.log('added user successfully')
+                    //console.log('user added successfully')
                 });
             });
             res.redirect('/');
@@ -137,6 +133,7 @@ app.post('/signin', function (req, res) {
     });
 });
 
+//Deconnecte l'utilisateur
 app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
@@ -155,10 +152,10 @@ app.get('/comp', function (req, res) {
 app.post('/comp', function (req, res) {
     let sqldelete = `DELETE FROM note WHERE client_idclientvoter = ${req.user.idclient} AND client_idclientvotant = ${req.user.idclient}`;
     con.query(sqldelete, function (err, result) {
-        console.log(result)
-            if (err) throw err;
-            console.log('ancienne notes votée supprimmées');
-    //Insere les competences perso
+        //console.log(result)
+        if (err) throw err;
+        //console.log('ancienne notes votée supprimmées');
+        //Insere les competences perso
         var sql = `INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES 
 (${req.user.idclient}, ${req.user.idclient}, 1, ${req.body.comp1}),
 (${req.user.idclient}, ${req.user.idclient}, 2, ${req.body.comp2}),
@@ -172,7 +169,7 @@ app.post('/comp', function (req, res) {
 (${req.user.idclient}, ${req.user.idclient}, 10, ${req.body.comp10})`;
         con.query(sql, function (err, result) {
             if (err) throw err;
-            console.log('note ajoutée');
+            //console.log('note ajoutée');
             res.redirect('/stat')
         });
     });
@@ -180,23 +177,20 @@ app.post('/comp', function (req, res) {
 
 //Affiche la page des votes
 app.get('/compVote', function (req, res) {
-    var sql = `SELECT * FROM client WHERE login != '${req.user.login}'`; 
-    console.log(sql)
+    var sql = `SELECT * FROM client WHERE login != '${req.user.login}'`;
     con.query(sql, function (err, userlist) {
-        //console.log('USERLIST: ', userlist);
-        
-        res.render('compVote',{
+        res.render('compVote', {
             users: userlist
         })
-    });   
+    });
 });
 
 //Recupere les votes et les insert dans la db
-app.post('/compVote', function (req, res){
+app.post('/compVote', function (req, res) {
     let sqldelete = `DELETE FROM note WHERE client_idclientvoter = ${req.body.idVoted} AND client_idclientvotant = ${req.user.idclient}`;
     con.query(sqldelete, function (err, result) {
-            if (err) throw err;
-            console.log('ancienne notes votée supprimmées');
+        if (err) throw err;
+        //console.log('ancienne notes votée supprimées');
         let sql = `INSERT INTO note (client_idclientvoter, client_idclientvotant, comp_idcomp, note) VALUES 
 (${req.body.idVoted}, ${req.user.idclient}, 1, ${req.body.comp1}),
 (${req.body.idVoted}, ${req.user.idclient}, 2, ${req.body.comp2}),
@@ -210,7 +204,7 @@ app.post('/compVote', function (req, res){
 (${req.body.idVoted}, ${req.user.idclient}, 10, ${req.body.comp10})`;
         con.query(sql, function (err, result) {
             if (err) throw err;
-            console.log('note votée ajoutée');
+            //console.log('note votée ajoutée');
             res.redirect('/stat');
         });
     });
@@ -218,7 +212,7 @@ app.post('/compVote', function (req, res){
 
 //Recupere les notes perso et les votes sur la db, et les affiche
 app.get('/stat', function (req, res) {
-    console.log("page stat request");
+    //console.log("page stat request");
     let idclient = req.user.idclient;
     //requete vers notes perso
     let sql = `SELECT * FROM note WHERE client_idclientvoter = ${idclient} AND client_idclientvotant = ${idclient}`;
@@ -247,8 +241,8 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
     let compArr;
     con.query(sql, function (err, result) {
         if (err) throw err;
-        console.log(result)
-        if (result[0]){
+        ////console.log(result)
+        if (result[0]) {
             compArr = [Number(result[0].note),
                        Number(result[1].note),
                        Number(result[2].note),
@@ -262,7 +256,7 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
         }
         con.query(sqlVote, function (err, result2) {
             //if (err) res.redirect('/comp');//throw err;
-            let voteArr =[Number(result2[0].avg),
+            let voteArr = [Number(result2[0].avg),
                        Number(result2[1].avg),
                        Number(result2[2].avg),
                        Number(result2[3].avg),
@@ -272,8 +266,8 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
                        Number(result2[7].avg),
                        Number(result2[8].avg),
                        Number(result2[9].avg)]
-            console.log(result)
-            if (result.length ){
+            ////console.log(result)
+            if (result.length) {
                 res.render('stat', {
                     title: "Statistiques",
                     user: req.user.login,
@@ -287,6 +281,168 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
     });
 });
 
+//Afficher la page Comparatif
+app.get('/comparatif', function (req, res) {
+    console.log(req);
+    let idclient = req.user.idclient;
+    //let idclient = req.body.idVoted
+    //requete vers notes perso
+    let sql = `SELECT * FROM note WHERE client_idclientvoter = ${idclient} AND client_idclientvotant = ${idclient}`;
+    //requete vers notes votée
+    let sqlVote = `
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 1)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 2)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 3)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 4)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 5)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 6)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 7)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 8)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 9)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 10)`;
+    //Lancement des requetes
+    let compArr;
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        ////console.log(result)
+        if (result[0]) {
+            compArr = [Number(result[0].note),
+                       Number(result[1].note),
+                       Number(result[2].note),
+                       Number(result[3].note),
+                       Number(result[4].note),
+                       Number(result[5].note),
+                       Number(result[6].note),
+                       Number(result[7].note),
+                       Number(result[8].note),
+                       Number(result[9].note)];
+        }
+        con.query(sqlVote, function (err, result2) {
+            //if (err) res.redirect('/comp');//throw err;
+            let voteArr = [Number(result2[0].avg),
+                       Number(result2[1].avg),
+                       Number(result2[2].avg),
+                       Number(result2[3].avg),
+                       Number(result2[4].avg),
+                       Number(result2[5].avg),
+                       Number(result2[6].avg),
+                       Number(result2[7].avg),
+                       Number(result2[8].avg),
+                       Number(result2[9].avg)]
+            ////console.log(result)
+            var sql = `SELECT * FROM client WHERE login != '${req.user.login}'`;
+            con.query(sql, function (err, userlist) {
+                console.log(userlist)
+                /*res.render('compVote', {
+                users: userlist
+                });*/
+            
+                if (result.length) {
+                    
+                    res.render('comparatif', {
+                        title: "Compara",
+                        user: req.user.login,
+                        dataUser: compArr,
+                        dataVote: voteArr,
+                        users: userlist
+                    });
+                } else {
+                    res.redirect('/comp')
+                }
+            });
+        });
+    });
+});
+
+app.post('/voir',function (req, res) {
+    console.log(req.body.idVoted)
+    let idclient = req.body.idVoted;
+    //let idclient = req.body.idVoted
+    //requete vers notes perso
+    let sql = `SELECT * FROM note WHERE client_idclientvoter = ${idclient} AND client_idclientvotant = ${idclient}`;
+    //requete vers notes votée
+    let sqlVote = `
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 1)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 2)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 3)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 4)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 5)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 6)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 7)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 8)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 9)
+UNION ALL
+SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND client_idclientvotant != ${idclient} AND comp_idcomp = 10)`;
+    //Lancement des requetes
+    let compArr;
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        ////console.log(result)
+        if (result[0]) {
+            compArr = [Number(result[0].note),
+                       Number(result[1].note),
+                       Number(result[2].note),
+                       Number(result[3].note),
+                       Number(result[4].note),
+                       Number(result[5].note),
+                       Number(result[6].note),
+                       Number(result[7].note),
+                       Number(result[8].note),
+                       Number(result[9].note)];
+        }
+        con.query(sqlVote, function (err, result2) {
+            //if (err) res.redirect('/comp');//throw err;
+            let voteArr = [Number(result2[0].avg),
+                       Number(result2[1].avg),
+                       Number(result2[2].avg),
+                       Number(result2[3].avg),
+                       Number(result2[4].avg),
+                       Number(result2[5].avg),
+                       Number(result2[6].avg),
+                       Number(result2[7].avg),
+                       Number(result2[8].avg),
+                       Number(result2[9].avg)]
+            ////console.log(result)
+            var sql = `SELECT * FROM client WHERE login != '${req.user.login}'`;
+            con.query(sql, function (err, userlist) {
+                console.log(userlist)
+                /*res.render('compVote', {
+                users: userlist
+                });*/
+            
+                if (result.length) {
+                    
+                    res.render('comparatif', {
+                        title: "Compara",
+                        user: req.user.login,
+                        dataUser: compArr,
+                        dataVote: voteArr,
+                        users: userlist
+                    });
+                } else {
+                    res.redirect('/compVote')
+                }
+            });
+        });
+    });
+});
 /////////// FUNCTION //////////////
 //check if user is logged in
 function loggedIn(req, res, next) {
@@ -308,7 +464,7 @@ var con = mysql.createConnection({
 
 //Genere un log lors des erreurs sql
 con.on('error', function (err) {
-    console.log("[mysql error]", err);
+    //console.log("[mysql error]", err);
 });
 
 ///////////// SQL END ////////////////////
