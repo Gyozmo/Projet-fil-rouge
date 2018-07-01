@@ -33,13 +33,13 @@ Connection a DB
 
 Prévu :
 
-Faire les interasctions DB avec le serveur 
+Faire les interasctions DB avec le serveur
 
 
 Probleme :
 
 
-Conceptualiser de la BDD 
+Conceptualiser de la BDD
 
 
 
@@ -58,7 +58,7 @@ Assemblage des compétences aux inputs
 
 Probleme :
 
-Pas de problèmes 
+Pas de problèmes
 
 
 
@@ -94,10 +94,11 @@ Probleme :
 	Le Dimanche 01/07
 
 Produit :
-
+- comparatifs + diagrames
+- finalisation css
 
 Prévu :
+- mise en ligne via heroku
 
 
 Probleme :
-
