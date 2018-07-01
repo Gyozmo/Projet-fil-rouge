@@ -1,5 +1,7 @@
 /* general */
-
+body {
+    font-family: 'Open Sans', sans-serif;
+}
 
 /* header */
 header {

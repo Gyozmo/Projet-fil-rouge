@@ -73,7 +73,11 @@ passport.serializeUser(function (user, done) {
 // used to deserialize the user
 passport.deserializeUser(function (id, done) {
     con.query(`SELECT * FROM client WHERE idclient = ${id}`, function (err, rows) {
+        if(rows.length){
         done(err, rows[0]);
+        } else {
+            res.redirect('/login');
+        }
     });
 });
 
@@ -175,8 +179,10 @@ app.post('/comp', function (req, res) {
     });
 });
 
-//Affiche la page des votes
+//Affiche la page des votes// page obsolete
 app.get('/compVote', function (req, res) {
+    if (!req.user.idclient)
+        res.redirect('/login');
     var sql = `SELECT * FROM client WHERE login != '${req.user.login}'`;
     con.query(sql, function (err, userlist) {
         res.render('compVote', {
@@ -213,7 +219,8 @@ app.post('/compVote', function (req, res) {
 
 //Recupere les notes perso et les votes sur la db, et les affiche
 app.get('/stat', function (req, res) {
-    //console.log("page stat request");
+    if (!req.user.idclient)
+        res.redirect('/login');
     let idclient = req.user.idclient;
     //requete vers notes perso
     let sql = `SELECT * FROM note WHERE client_idclientvoter = ${idclient} AND client_idclientvotant = ${idclient}`;
@@ -284,9 +291,9 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
 
 //Afficher la page Comparatif
 app.get('/comparatif', function (req, res) {
-    //console.log(req);
+    if (!req.user.idclient)
+        res.redirect('/login');
     let idclient = req.user.idclient;
-    //let idclient = req.body.idVoted
     //requete vers notes perso
     let sql = `SELECT * FROM note WHERE client_idclientvoter = ${idclient} AND client_idclientvotant = ${idclient}`;
     //requete vers notes votée
@@ -314,7 +321,6 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
     let compArr;
     con.query(sql, function (err, result) {
         if (err) throw err;
-        ////console.log(result)
         if (result[0]) {
             compArr = [Number(result[0].note),
                        Number(result[1].note),
@@ -328,7 +334,7 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
                        Number(result[9].note)];
         }
         con.query(sqlVote, function (err, result2) {
-            //if (err) res.redirect('/comp');//throw err;
+            if (err) throw err;
             let voteArr = [Number(result2[0].avg),
                        Number(result2[1].avg),
                        Number(result2[2].avg),
@@ -339,16 +345,9 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
                        Number(result2[7].avg),
                        Number(result2[8].avg),
                        Number(result2[9].avg)]
-            ////console.log(result)
             var sql = `SELECT * FROM client WHERE login != '${req.user.login}'`;
             con.query(sql, function (err, userlist) {
-                console.log(userlist)
-                /*res.render('compVote', {
-                users: userlist
-                });*/
-            
                 if (result.length) {
-                    
                     res.render('comparatif', {
                         title: "Compara",
                         user: req.user.login,
@@ -365,14 +364,8 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
 });
 
 app.post('/voir',function (req, res) {
-    //console.log("USER A VOIR: ",req.body.idVoted);
     let tmp = req.body.idVoted.split('|');
-    //console.log("TMP: ",tmp);
-    
-    //let idclient = req.body.idVoted[idclient];
     let idclient = tmp[0];
-    //console.log(idclient)
-    //let idclient = req.body.idVoted
     //requete vers notes perso
     let sql = `SELECT * FROM note WHERE client_idclientvoter = ${idclient} AND client_idclientvotant = ${idclient}`;
     //requete vers notes votée
@@ -400,7 +393,6 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
     let compArr;
     con.query(sql, function (err, result) {
         if (err) throw err;
-        ////console.log(result)
         if (result[0]) {
             compArr = [Number(result[0].note),
                        Number(result[1].note),
@@ -414,7 +406,6 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
                        Number(result[9].note)];
         }
         con.query(sqlVote, function (err, result2) {
-            //if (err) res.redirect('/comp');//throw err;
             let voteArr = [Number(result2[0].avg),
                        Number(result2[1].avg),
                        Number(result2[2].avg),
@@ -428,11 +419,6 @@ SELECT AVG(note) AS avg FROM note WHERE ( client_idclientvoter = ${idclient} AND
             ////console.log(result)
             var sql = `SELECT * FROM client WHERE login != '${req.user.login}'`;
             con.query(sql, function (err, userlist) {
-                console.log(userlist)
-                /*res.render('compVote', {
-                users: userlist
-                });*/
-            
                 if (result.length) {
                     
                     res.render('comparatif', {
