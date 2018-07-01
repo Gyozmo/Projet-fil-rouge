@@ -187,6 +187,7 @@ app.get('/compVote', function (req, res) {
 
 //Recupere les votes et les insert dans la db
 app.post('/compVote', function (req, res) {
+    console.log("VOTE: ",req.body.idVoted, req.user.idclient)
     let sqldelete = `DELETE FROM note WHERE client_idclientvoter = ${req.body.idVoted} AND client_idclientvotant = ${req.user.idclient}`;
     con.query(sqldelete, function (err, result) {
         if (err) throw err;
