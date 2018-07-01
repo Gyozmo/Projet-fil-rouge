@@ -6,23 +6,7 @@
 
 <div class="container-fluid">
 
-<!--<form class="border bg-light p-2 mt-3 mb-3 rounded" action="/comparatif" method="post">
-    <div class="input-group">
-        <div class="input-group-prepend">
-            <label class="input-group-text bg-success text-light" for="inputGroupSelect01">Choisir un utilisateur</label>
-        </div>
-            <select name="idVoted" class="custom-select" id="inputGroupSelect01" required>
-                <option value="" selected>dans cette liste pour voir ses compétences...</option>
-                <% users.forEach(function(user){ %>
-                <option value="<%= user.idclient  %>" > <%= user.login  %> </option>
-                <% })%>
-            </select>
-        <div class="form-group">
-            <button type="submit" name="userChoice" class="btn btn-outline-success" value="Submit">Envoyer</button>
-        </div>
-    </div>
-</form>-->
-            <!-- Section 1 -->
+
 <div class="row m-3">
 <div class="col-sm-4">
     <form class="" action="/compVote" method="post">
@@ -94,7 +78,7 @@
             <select name="idVoted" class="custom-select" id="inputGroupSelect01" required>
                 <option value="" selected>dans cette liste pour voir ses compétences...</option>
                 <% users.forEach(function(user){ %>
-                <option value="<%= user.idclient  %>" > <%= user.login  %> </option>
+                <option value="<%= user.idclient  %>|<%= user.login  %>" userName="<%= user.login  %>"> <%= user.login  %> </option>
                 <% })%>
             </select>
             <button type="submit" name="userChoice" class="btn btn-outline-success ml-2" value="Submit">Envoyer</button>
